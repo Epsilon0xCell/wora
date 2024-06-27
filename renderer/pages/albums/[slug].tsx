@@ -13,12 +13,20 @@ import {
 } from "@tabler/icons-react";
 import { usePlayer } from "@/context/playerContext";
 
+type Song = {
+  id: number;
+  filePath: string;
+  name: string;
+  artist: string;
+  duration: number;
+};
+
 type Album = {
   name: string;
   artist: string;
   year: number;
   coverArt: string;
-  songs: any[];
+  songs: Song[];
 };
 
 export default function Album() {
@@ -30,13 +38,13 @@ export default function Album() {
     window.ipc
       .invoke("getAlbumWithSongs", router.query.slug)
       .then((response) => {
-        setAlbum(response.albumWithSongs);
+        setAlbum(response);
+        console.log(response);
       });
   }, [router.query.slug]);
 
   const handleMusicClick = (index: number) => {
     if (album) {
-      console.log(index);
       setQueueAndPlay(album.songs, index);
     }
   };
@@ -57,7 +65,7 @@ export default function Album() {
     <ScrollArea className="mt-2.5 h-full w-full rounded-xl gradient-mask-b-80">
       <div className="relative h-96 w-full overflow-hidden rounded-xl">
         <Image
-          alt={album && album.name}
+          alt={album ? album.name : "Album Cover"}
           src={album ? album.coverArt : "/coverArt.png"}
           fill
           loading="lazy"
@@ -70,14 +78,13 @@ export default function Album() {
           <div className="flex items-end gap-4">
             <div className="relative h-52 w-52 overflow-hidden rounded-lg shadow-xl transition duration-300">
               <Image
-                alt={album && album.name}
+                alt={album ? album.name : "Album Cover"}
                 src={album ? album.coverArt : "/coverArt.png"}
                 fill
                 loading="lazy"
                 className="scale-[1.01] object-cover"
               />
             </div>
-
             <div className="flex flex-col gap-4">
               <div>
                 <h1 className="text-2xl font-medium text-white">
